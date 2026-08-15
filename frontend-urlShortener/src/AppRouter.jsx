@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import ShortenUrlPage from "./components/ShortenUrlPage";
 import { Toaster } from "react-hot-toast";
@@ -16,7 +16,15 @@ import ErrorPage from "./components/ErrorPage";
 // </PrivateRoute>
 
 const AppRouter = () => {
-  const hideHeaderFooter = location.pathname.startsWith("/s");
+  const { pathname } = useLocation();
+
+  // Static app pages that should show NavBar/Footer.
+  // Any other single-segment path is treated as a short URL code.
+  const appPaths = ["/", "/about", "/register", "/login", "/dashboard", "/error"];
+  const isAppPath = appPaths.some(
+    (path) => pathname === path || pathname.startsWith(path + "/")
+  );
+  const hideHeaderFooter = !isAppPath;
 
     return (
         <>
@@ -26,6 +34,7 @@ const AppRouter = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/s/:url" element={<ShortenUrlPage />} />
+          <Route path="/:url" element={<ShortenUrlPage />} />
 
           <Route path="/register" element={<PrivateRoute publicPage={true}><RegisterPage /></PrivateRoute>} />
           <Route path="/login" element={<PrivateRoute publicPage={true}><LoginPage /></PrivateRoute>} />
